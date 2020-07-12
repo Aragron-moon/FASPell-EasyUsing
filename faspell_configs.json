@@ -1,0 +1,33 @@
+
+{
+  "general_configs": {
+    "rank": 2,
+    "round": 1,
+    "weights": {
+      "visual": 1,
+      "phonological": 0
+    },
+    "char_meta": "data/all_char_meta.txt",
+    "lm": {
+      "max_seq": 128,
+      "top_n": 5,
+      "batch_size": 5,
+      "vocab": "model/pre-trained/vocab.txt",
+      "bert_configs": "model/pre-trained/bert_config.json",
+      "pre-trained": "model/pre-trained/bert_model.ckpt",
+      "fine-tuned": "model/fine-tune-15/model.ckpt-12000",
+      "fine_tuning_is_on": true
+    }
+  },
+  "exp_configs": {
+    "union_of_sims": true,
+    "testing_set": "./data/test_ofsighan15.txt",
+    "training_set": "./data/train_srcofsighan15.txt",
+    "tackle_n_gram_bias": true,
+    "dump_candidates": "",
+    "read_from_dump": false,
+    "filter_is_on": true,
+    "store_plots": "plots",
+    "store_latex": "./"
+  }
+}
