@@ -621,8 +621,8 @@ def repeat_non_test(sentences, spell_checker, repeat_num):
     args = parse_args()
     if args.mode == 's':
         for i in range(len(correction_history)):
-            print('纠正前：', all_results[i]["original_sentence"])
-            print('纠正后：', all_results[i]["corrected_sentence"])
+            print('纠正前：', correction_history[i]["original_sentence"])
+            print('纠正后：', correction_history[i]["correction_history"][-1])
             print('*'*30)
 
     #将每一个句子的纠错结果写入到result_{i}.josn中
