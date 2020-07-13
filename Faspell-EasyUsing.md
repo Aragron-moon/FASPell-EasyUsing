@@ -20,7 +20,7 @@
 
 ## 源码目录结构和该项目目录结构对比
 
-![projectStruct](E:\download\GitHub\Me\Faspell-EasyUsing\images\projectStruct.png)
+![](https://github.com/Aragron-moon/FASPell-EasyUsing/blob/master/images/projectStruct.png)
 
 下载好Faspell并用pycharm打开的目录结构如上：
 
@@ -47,7 +47,7 @@
 
 该项目在pycharm上的目录结构如下：
 
-![newProjectStruct](E:\download\GitHub\Me\Faspell-EasyUsing\images\newProjectStruct.png)
+![](https://github.com/Aragron-moon/FASPell-EasyUsing/blob/master/images/newProjectStruct.png)
 
 两个项目结构不一样的地方（只介绍重要的地方）：
 
@@ -78,7 +78,7 @@
 
 [Bert预训练模型]()   也可以在原项目中直接获取到下载路径，并将下载好的文件放到model/pre-trained/下,文件结构如下所示：
 
-![pre-trained](E:\download\GitHub\Me\Faspell-EasyUsing\images\pre-trained.png)
+![](https://github.com/Aragron-moon/FASPell-EasyUsing/blob/master/images/pre-trained.png)
 
 **微调**
 
@@ -120,7 +120,7 @@
 
 在bert_modified目录下，运行run_pretraining.py
 
-`python run_pretraining.py --input_file './tf_examples1.tfrecord' --bert_config_file '../model/pre-trained/bert_config.json' --output_dir '../model/fine-tune/' --init_checkpoint '../model/pre-trained/bert_model.ckpt' --do_train True`
+`python run_pretraining.py --input_file './tf_examples1.tfrecord' --bert_config_file '../model/pre-trained/bert_config.json' --output_dir '../model/fine-tuned/' --init_checkpoint '../model/pre-trained/bert_model.ckpt' --do_train True`
 
 必须指定的参数：
 
@@ -128,7 +128,7 @@
 
 Bert的配置文件   --bert_config_file '../model/pre-trained/bert_config.json'   指定为pre-trained下的配置文件；
 
-模型微调参数的保存位置   --output_dir '../model/fine-tune/'   指定为modl/fine-tune/；
+模型微调参数的保存位置   --output_dir '../model/fine-tuned/'   指定为modl/fine-tuned/；
 
 模型初始化参数的保存位置   --init_checkpoint '../model/pre-trained/bert_model.ckpt'   指定为pre-trained下的参数；
 
@@ -139,7 +139,7 @@ Bert的配置文件   --bert_config_file '../model/pre-trained/bert_config.json'
 需要注意：
 
 + 模型在训练过程中，由于显卡的不一致会因为batchsize的值而导致OOM错误，解决该问题可以通过更改run_pretraining.py中batchsize的默认值或者在执行命令时通过参数train_batch_size设置batchsize的值（我已经在run_pretraining.py中修改了batchsize默认值为16）；
-+ 模型在微调时，指定训练Step为10000步时停止（论文中给出的具体训练步数），对于这一点其实是有待商榷的，具体原因会在总结中说明。在模型微调时，可以在model/fine-tune/下观察到不断有新的模型参数被保存，当10000步模型参数保存后，就可以停止模型的训练；
++ 模型在微调时，指定训练Step为10000步时停止（论文中给出的具体训练步数），对于这一点其实是有待商榷的，具体原因会在总结中说明。在模型微调时，可以在model/fine-tuned/下观察到不断有新的模型参数被保存，当10000步模型参数保存后，就可以停止模型的训练；
 
 **训练CSD**
 
@@ -186,7 +186,7 @@ faspell_configs.json：
 
 开始训练CSD，这其实是一个细致活，本身没有什么技巧难度而言，只是要做到仔细。在开始之前，需要检查faspell.py文件中的部分内容是否如下所示：
 
-![train_before](E:\download\GitHub\Me\Faspell-EasyUsing\images\train_before.png)
+![](https://github.com/Aragron-moon/FASPell-EasyUsing/blob/master/images/train_before.png)
 
 确定每一个地方都是`Curves.curve_null`，因为我们训练的目的就是为了找打合适的过滤曲线，所以必须确保得到所有的原始数据，这里的函数就是什么都不过滤，当我们训练结束和，就可以将找到的过滤去曲线进行替换。
 
@@ -294,15 +294,9 @@ difference_1-rank_0-results_0.png&&difference_1-rank_0-results_02.png：本次�
 
 eg：
 
+![](https://github.com/Aragron-moon/FASPell-EasyUsing/blob/master/images/difference_1-rank_0-results_0.png)
 
-
-<img src="E:\download\GitHub\Me\Faspell-EasyUsing\images\difference_1-rank_0-results_02.png" alt="difference_1-rank_0-results_02" style="zoom:50%;" />
-
-<img src="E:\download\GitHub\Me\Faspell-EasyUsing\images\difference_1-rank_0-results_02.png" alt="difference_1-rank_0-results_02" style="zoom:50%;" />
-
-
-
-
+![](https://github.com/Aragron-moon/FASPell-EasyUsing/blob/master/images/difference_1-rank_0-results_02.png)
 
 difference_1-rank_0-results_0.txt：本次训练的结果
 
@@ -405,7 +399,7 @@ eg：
 
 针对12组训练的实验结果图，进行观察，对每一组结果图（difference_1-rank_0-results_0.png&&difference_1-rank_0-results_02.png）人工得到过滤曲线（效果如下，图片来自论文）
 
-![picture](E:\download\GitHub\Me\Faspell-EasyUsing\images\picture.png)
+![](https://github.com/Aragron-moon/FASPell-EasyUsing/blob/master/images/picture.png)
 
 对于曲线的实现，采用条曲线的切线进行实现，如代码中给出的示例(采用两条直线来模拟曲线)：
 
@@ -431,11 +425,11 @@ eg：
 
 训练前：
 
-![train_before1](E:\download\GitHub\Me\Faspell-EasyUsing\images\train_before1.png)
+![](https://github.com/Aragron-moon/FASPell-EasyUsing/blob/master/images/train_before1.png)
 
 训练后，得到过滤方式，进行更改：
 
-![train_after](E:\download\GitHub\Me\Faspell-EasyUsing\images\train_after.png)
+![](https://github.com/Aragron-moon/FASPell-EasyUsing/blob/master/images/train_after.png)
 
 **我在该项目的代码中给出了一些例子，这些例子没有严格得出，只是为了更好的理解代码。所有的过滤曲线都需要自己通过做实验的方式得出！**
 
