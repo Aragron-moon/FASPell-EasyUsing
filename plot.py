@@ -14,8 +14,6 @@ def plot(json_fname, results_fname, store_plots='', plots_to_latex=''):
     truely_detected_and_falsely_corrected = [[], []]
     falsely_detected = [[], []]
 
-    AllcheckChar = [] #记录所有的checkperchar
-
     count_of_absence_of_correct_chars = [0, 0]
 
     w3 = open(f'{name}_falsely_detected.txt', 'w', encoding='utf-8')
@@ -25,10 +23,6 @@ def plot(json_fname, results_fname, store_plots='', plots_to_latex=''):
         origin_num, wrong_sent, correct_sent, predict_sent, num = line.strip().split('\t')
         pos_to_error = dict([(e["error_position"], e) for e in entry["errors"]])
         for pos, (w, c, p) in enumerate(zip(wrong_sent, correct_sent, predict_sent)):
-            # 为了得到每个点的具体信息所对应的其余信息，定义出一个json格式的字段 checkperChar
-            checkperChar = {"rank": '0',
-                            "simtype": 'shape',
-                            "top_difference": 'false'}
             if w != c and w != p:#正确检查
                 e = pos_to_error[pos]
                 assert e["corrected_to"] == p
@@ -40,7 +34,6 @@ def plot(json_fname, results_fname, store_plots='', plots_to_latex=''):
                         absent = 'yes'
                     truely_detected_and_falsely_corrected[0].append(e["confidence"])
                     truely_detected_and_falsely_corrected[1].append(e["similarity"])
-                    checkperChar["lable"] = "T-d-F-c"         #指定标签
 
                     w4.write('\t'.join([wrong_sent,
                                         f'pos={pos}',
@@ -50,25 +43,10 @@ def plot(json_fname, results_fname, store_plots='', plots_to_latex=''):
                                         f'sim={e["similarity"]}',
                                         f'absent={absent}']) + '\n')
                 else:#正确检查且正确纠正
-
-                    checkperChar["lable"] = "T-d-T-c"#指定标签
                     truely_detected_and_truely_corrected[0].append(e["confidence"])
                     truely_detected_and_truely_corrected[1].append(e["similarity"])
 
-                checkperChar["sentence"] = wrong_sent
-                checkperChar["error_position"] = pos
-                checkperChar["original"] = w
-                checkperChar["corrected_to"] = p
-                checkperChar["correct"] = c
-                checkperChar["candidates"] = e['candidates']
-                checkperChar["confidence"] = e["confidence"]
-                checkperChar["similarity"] = e["similarity"]
-
-                AllcheckChar.append(checkperChar)
-
             elif w == c and w != p:#错误检查 本身正确却被判定为错误
-
-                checkperChar["lable"] = "F-d"  # 指定标签
                 e = pos_to_error[pos]
                 candidates = dict(sorted(list(e["candidates"].items()), reverse=True, key=lambda it: it[1])[:5])
                 absent = 'no'
@@ -87,16 +65,6 @@ def plot(json_fname, results_fname, store_plots='', plots_to_latex=''):
                                     f'sim={e["similarity"]}',
                                     f'absent={absent}']) + '\n')
 
-                checkperChar["sentence"] = wrong_sent
-                checkperChar["error_position"] = pos
-                checkperChar["original"] = w
-                checkperChar["corrected_to"] = p
-                checkperChar["correct"] = c
-                checkperChar["candidates"] = e['candidates']
-                checkperChar["confidence"] = e["confidence"]
-                checkperChar["similarity"] = e["similarity"]
-
-                AllcheckChar.append(checkperChar)
             elif w!=c and w==p:#本身是错误的 模型没有检查出来 CSC在画图的时候 未考虑这一类点
                 pass
                 #print('==' * 20)
@@ -105,11 +73,6 @@ def plot(json_fname, results_fname, store_plots='', plots_to_latex=''):
                 #print(correct_sent)
                 #print(predict_sent)
                 #print('==' * 20)
-    #存储所有的样本点
-    w = open(f'{name}_spellCSCchecker.json', 'w', encoding='utf-8')
-    w.write(json.dumps(AllcheckChar, ensure_ascii=False, indent=4, sort_keys=False))
-    w.close()
-
     # print statistics
     print(f'In {len(truely_detected_and_falsely_corrected[0])} falsely corrected characters,'
           f' {count_of_absence_of_correct_chars[0]} are because of absent correct candidates.')
@@ -152,8 +115,3 @@ def produce_latex(truely_detected_and_truely_corrected, truely_detected_and_fals
         f.write(f'({c_x},{c_y})[c]')
 
     f.close()
-
-'''
-对于这个文件的主要改动在于 引入了一个checkperChar字段 用于记录当前实验中产生的三类点（Fd TdFc TdTc）
-并保存为文件，方便读取文件，绘制论文中的散点图，从而进行过滤器的选择
-'''

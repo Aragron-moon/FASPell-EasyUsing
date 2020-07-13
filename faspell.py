@@ -10,8 +10,7 @@ import logging
 import plot
 import tqdm
 import time
-from sklearn.externals import joblib
-from sklearn import svm
+
 
 
 
@@ -46,22 +45,20 @@ class LM_Config(object):
 
 
 #构造过滤器
-#不再使用文章提到的手中找出Curve的方式进行判断 而是使用sklearn中的SVM模型进行判断
-
 class Filter(object):
     def __init__(self):
         self.curve_idx_sound = {0: {0: Curves.curve_full,  # 0 for non-difference
-                              1: joblib.load("../Curmodel/d0r1pro.pkl"),#Curves.curve_d0r1p,
-                              2: joblib.load("../Curmodel/d0r2pro.pkl"),#Curves.curve_d0r2p,
+                              1: Curves.curve_d0r1p,
+                              2: Curves.curve_d0r2p,
                               3: Curves.curve_null,
                               4: Curves.curve_null,
                               5: Curves.curve_null,
                               6: Curves.curve_null,
                               7: Curves.curve_null,
                               },
-                          1: {0: joblib.load("../Curmodel/d1r0pro.pkl"),#Curves.curve_d1r0p,  # 1 for difference
-                              1: joblib.load("../Curmodel/d1r1pro.pkl"),#Curves.curve_d1r1p,
-                              2: joblib.load("./Curmodel/d1r2pro.pkl"),#Curves.curve_d1r2p,
+                          1: {0: Curves.curve_d1r0p,  # 1 for difference
+                              1: Curves.curve_d1r1p,
+                              2: Curves.curve_d1r2p,
                               3: Curves.curve_null,
                               4: Curves.curve_null,
                               5: Curves.curve_null,
@@ -70,17 +67,17 @@ class Filter(object):
                               }}
 
         self.curve_idx_shape = {0: {0: Curves.curve_full,  # 0 for non-difference
-                                    1: joblib.load("./Curmodel/d0r1shape.pkl"),#Curves.curve_d0r1s,
-                                    2: joblib.load("./Curmodel/d0r2shape.pkl"),#Curves.curve_d0r2s,
+                                    1: Curves.curve_d0r1s,
+                                    2: Curves.curve_d0r2s,
                                     3: Curves.curve_null,
                                     4: Curves.curve_null,
                                     5: Curves.curve_null,
                                     6: Curves.curve_null,
                                     7: Curves.curve_null,
                                     },
-                                1: {0: joblib.load("./Curmodel/d1r0shape.pkl"),#Curves.curve_d1r0s,#Curves.curve_null,  # 1 for difference y1 = (7.64960918 * x1 -7) / - 2.87156076
-                                    1: joblib.load("./Curmodel/d1r1shape.pkl"),#Curves.curve_d1r1s,##Curves.curve_null,   #y1 = (-6.55747136 * x1 +1) / - 0.34981225
-                                    2: joblib.load("./Curmodel/d1r2shape.pkl"),#Curves.curve_d1r2s,##Curves.curve_null,   #y1 = (-13.00472474 * x1 +1) / - 0.49462212
+                                1: {0: Curves.curve_d1r0s,#Curves.curve_null,  # 1 for difference y1 = (7.64960918 * x1 -7) / - 2.87156076
+                                    1: Curves.curve_d1r1s,##Curves.curve_null,   #y1 = (-6.55747136 * x1 +1) / - 0.34981225
+                                    2: Curves.curve_d1r2s,##Curves.curve_null,   #y1 = (-13.00472474 * x1 +1) / - 0.49462212
                                     3: Curves.curve_null,
                                     4: Curves.curve_null,
                                     5: Curves.curve_null,
@@ -98,16 +95,8 @@ class Filter(object):
         else:
             curve = Curves.curve_null
 
-        #引入sklearn模型后 此处采用训练好的模型进行判断
-        #if curve(error["confidence"], error["similarity"]) and self.special_filters(error):
-        #    return True
-
-        if isinstance(curve, svm.SVC):
-            if curve.predict([[error["confidence"], error["similarity"]]])[0]== 1:
-                return True
-        else:
-            if curve(error["confidence"], error["similarity"]) and self.special_filters(error):
-                return True
+        if curve(error["confidence"], error["similarity"]) and self.special_filters(error):
+            return True
 
         return False
 
@@ -168,7 +157,6 @@ class Curves(object):
         flag2 = similarity > 0.4
         if flag1 or flag2:
             return True
-
         return False
 
     def curve_d1r1s(confidence, similarity):
@@ -208,7 +196,6 @@ class Curves(object):
             return True
 
         return False
-
 
         return False
 
@@ -594,59 +581,6 @@ def extension(candidates):#两个邻近的full-width 数字或字母被当做一
 
     return new_candidates
 
-
-'''通过实验 发现上述逻辑extension存在问题，应该纠正为下面的代码
-#分为两种需要进行解决
-#只解决每一个token的第一个候选candidate长度为2的情况
-#解决每一个token中候选candidate长度为2的情况
- '''
-#只解决每一个token的第一个候选candidate长度为2的情况
-def extension1(candidates):  # 两个邻近的full-width 数字或字母被当做一个token输入了mlm
-    """this function is to resolve the bug that when two adjacent full-width numbers/letters are fed to mlm,
-       the output will be merged as one output, thus lead to wrong alignments."""
-    new_candidates = []
-    for j, cand_tokens in enumerate(candidates):  # candidates：[[('token1',Pro),('token1',Pro),('token1',Pro)...('token1',Pro)],[('token2',Pro),('token2',Pro),('token2',Pro)...('token2',Pro)]...]
-        real_cand_tokens = cand_tokens[0][0]  # 每一个token的第一个候选
-        if '##' in real_cand_tokens:  # sometimes the result contains '##', so we need to get rid of them first
-            real_cand_tokens = real_cand_tokens[2:]
-        # 正常情况 每一个产生的候选长度应该为1  用于将长度为2的一个candidate拆分成 两个长度为1的candidate
-        new_cand = []
-        if len(real_cand_tokens) == 2 and not re.findall(r'[a-zA-ZＡ-Ｚａ-ｚ]+', real_cand_tokens):
-            a = []
-            b = []
-            a.append((real_cand[0], score))
-            b.append((real_cand[-1], score))
-            new_cand.append(a)
-            new_cand.append(b)
-            for cand, score in cand_tokens[1:]:#已经处理掉了第一个，后续的不做处理
-                new_cand((cand,score))
-        else:
-            new_cand = cand_tokens
-        new_candidates.append(new_cand)
-    return new_candidates
-#解决每一个token中候选candidate长度为2的情况
-def extension2(candidates):  # 两个邻近的full-width 数字或字母被当做一个token输入了mlm
-    """this function is to resolve the bug that when two adjacent full-width numbers/letters are fed to mlm,
-       the output will be merged as one output, thus lead to wrong alignments."""
-    new_candidates = []
-    for j, cand_tokens in enumerate(candidates):  # candidates：[[('token1',Pro),('token1',Pro),('token1',Pro)...('token1',Pro)],[('token2',Pro),('token2',Pro),('token2',Pro)...('token2',Pro)]...]
-        new_cand = []
-        for cand, score in cand_tokens:#已经处理掉了第一个，后续的不做处理
-            real_cand_tokens = cand_tokens[0][0]  # 每一个token的第一个候选
-            if '##' in real_cand_tokens:  # sometimes the result contains '##', so we need to get rid of them first
-                real_cand_tokens = real_cand_tokens[2:]
-            if len(real_cand_tokens) == 2 and not re.findall(r'[a-zA-ZＡ-Ｚａ-ｚ]+', real_cand_tokens):
-                a = []
-                b = []
-                a.append((real_cand[0], score))
-                b.append((real_cand[-1], score))
-                new_cand.append(a)
-                new_cand.append(b)
-            else:
-                new_cand.append((cand, score))
-        new_candidates.append(new_cand)
-    return new_candidates
-
 #在测试文件上进行重复纠错测试
 def repeat_test(test_path, spell_checker, repeat_num, is_train, train_on_difference=True):
     sentences = []
@@ -684,6 +618,9 @@ def repeat_non_test(sentences, spell_checker, repeat_num):
     w.close()
     #将每一个句子的纠错结果写入到result_{i}.josn中
     for i, res in enumerate(all_results):
+        #对于命令行执行模式 将结果反馈到屏幕
+        print('纠正前：', all_results[i]["original_sentence"])
+        print('纠正后：', all_results[i]["corrected_sentence"])
         w = open(f'results_{i}.json', 'w', encoding='utf-8')
         w.write(json.dumps(res, ensure_ascii=False, indent=4, sort_keys=False))
         w.close()
