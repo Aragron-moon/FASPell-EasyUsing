@@ -120,7 +120,7 @@
 
 在bert_modified目录下，运行run_pretraining.py
 
-`python run_pretraining.py --input_file './tf_examples1.tfrecord' --bert_config_file '../model/pre-trained/bert_config.json' --output_dir '../model/fine-tuned/' --init_checkpoint '../model/pre-trained/bert_model.ckpt' --do_train True`
+`python run_pretraining.py --input_file './tf_examples.tfrecord' --bert_config_file '../model/pre-trained/bert_config.json' --output_dir '../model/fine-tuned/' --init_checkpoint '../model/pre-trained/bert_model.ckpt' --do_train True`
 
 必须指定的参数：
 
