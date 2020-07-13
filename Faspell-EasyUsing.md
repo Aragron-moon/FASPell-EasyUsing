@@ -20,7 +20,7 @@
 
 ## 源码目录结构和该项目目录结构对比
 
-![1594602318(1)](C:\Users\13550\Desktop\1594602318(1).png)
+![projectStruct](E:\download\GitHub\Me\Faspell-EasyUsing\images\projectStruct.png)
 
 下载好Faspell并用pycharm打开的目录结构如上：
 
@@ -47,9 +47,9 @@
 
 该项目在pycharm上的目录结构如下：
 
-![1594619705(1)](C:\Users\13550\Desktop\1594619705(1).png)
+![newProjectStruct](E:\download\GitHub\Me\Faspell-EasyUsing\images\newProjectStruct.png)
 
-两个项目结构不一样的地方：
+两个项目结构不一样的地方（只介绍重要的地方）：
 
 + bert_modified：引入了模型微调需要用到的代码，均是直接从Google上进行copy
   + optimization.py   模型微调过程中要使用的优化器
@@ -78,7 +78,7 @@
 
 [Bert预训练模型]()   也可以在原项目中直接获取到下载路径，并将下载好的文件放到model/pre-trained/下,文件结构如下所示：
 
-![1594609578(1)](C:\Users\13550\Desktop\1594609578(1).png)
+![pre-trained](E:\download\GitHub\Me\Faspell-EasyUsing\images\pre-trained.png)
 
 **微调**
 
@@ -186,7 +186,7 @@ faspell_configs.json：
 
 开始训练CSD，这其实是一个细致活，本身没有什么技巧难度而言，只是要做到仔细。在开始之前，需要检查faspell.py文件中的部分内容是否如下所示：
 
-![1594612451](C:\Users\13550\Desktop\1594612451.png)
+![train_before](E:\download\GitHub\Me\Faspell-EasyUsing\images\train_before.png)
 
 确定每一个地方都是`Curves.curve_null`，因为我们训练的目的就是为了找打合适的过滤曲线，所以必须确保得到所有的原始数据，这里的函数就是什么都不过滤，当我们训练结束和，就可以将找到的过滤去曲线进行替换。
 
@@ -294,9 +294,13 @@ difference_1-rank_0-results_0.png&&difference_1-rank_0-results_02.png：本次�
 
 eg：
 
-<img src="C:\Users\13550\Desktop\训练过程\metd(pro,rank0)\difference_1-rank_0-results_0.png" alt="difference_1-rank_0-results_0" style="zoom: 50%;" />
 
-<img src="C:\Users\13550\Desktop\训练过程\metd(pro,rank0)\difference_1-rank_0-results_02.png" alt="difference_1-rank_0-results_02" style="zoom:50%;" />
+
+<img src="E:\download\GitHub\Me\Faspell-EasyUsing\images\difference_1-rank_0-results_02.png" alt="difference_1-rank_0-results_02" style="zoom:50%;" />
+
+<img src="E:\download\GitHub\Me\Faspell-EasyUsing\images\difference_1-rank_0-results_02.png" alt="difference_1-rank_0-results_02" style="zoom:50%;" />
+
+
 
 
 
@@ -401,7 +405,7 @@ eg：
 
 针对12组训练的实验结果图，进行观察，对每一组结果图（difference_1-rank_0-results_0.png&&difference_1-rank_0-results_02.png）人工得到过滤曲线（效果如下，图片来自论文）
 
-![1594617382(1)](C:\Users\13550\Desktop\1594617382(1).png)
+![picture](E:\download\GitHub\Me\Faspell-EasyUsing\images\picture.png)
 
 对于曲线的实现，采用条曲线的切线进行实现，如代码中给出的示例(采用两条直线来模拟曲线)：
 
@@ -427,13 +431,13 @@ eg：
 
 训练前：
 
-![1594617879(1)](C:\Users\13550\Desktop\1594617879(1).png)
+![train_before1](E:\download\GitHub\Me\Faspell-EasyUsing\images\train_before1.png)
 
 训练后，得到过滤方式，进行更改：
 
-![1594617923(1)](C:\Users\13550\Desktop\1594617923(1).png)
+![train_after](E:\download\GitHub\Me\Faspell-EasyUsing\images\train_after.png)
 
-**我在该项目的代码中给出了一些例子，这些例子没有严格得出，只是为了大家更好的理解代码。所有的过滤曲线都需要自己通过做实验的方式得出！**
+**我在该项目的代码中给出了一些例子，这些例子没有严格得出，只是为了更好的理解代码。所有的过滤曲线都需要自己通过做实验的方式得出！**
 
 将12组训练方式得到的过滤曲线替换完成后，CSD的训练也结束了，下面就是应用，在应用模型前，需要将faspell_configs.json的部分配置信息做更改
 
@@ -451,7 +455,7 @@ s：命令行方式，在项目根目录运行命令
 
 `python faspell.py 扫吗关注么众号 受奇艺全网首播 -m s`
 
-f：对文件纠错，在项目根目录下运行命令
+f：对文件纠错，在项目根目录下运行命令（其中待纠错文件每一行为一条待纠错句子）
 
 `python faspell.py -m f -f '/data/待纠错文件'`
 

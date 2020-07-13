@@ -47,18 +47,18 @@ class LM_Config(object):
 #构造过滤器
 class Filter(object):
     def __init__(self):
-        self.curve_idx_sound = {0: {0: Curves.curve_full,  # 0 for non-difference
-                              1: Curves.curve_d0r1p,
-                              2: Curves.curve_d0r2p,
+        self.curve_idx_sound = {0: {0: Curves.curve_null,#Curves.curve_full,  # 0 for non-difference
+                              1: Curves.curve_null,#Curves.curve_d0r1p,
+                              2: Curves.curve_null,#Curves.curve_d0r2p,
                               3: Curves.curve_null,
                               4: Curves.curve_null,
                               5: Curves.curve_null,
                               6: Curves.curve_null,
                               7: Curves.curve_null,
                               },
-                          1: {0: Curves.curve_d1r0p,  # 1 for difference
-                              1: Curves.curve_d1r1p,
-                              2: Curves.curve_d1r2p,
+                          1: {0: Curves.curve_null,#Curves.curve_d1r0p,  # 1 for difference
+                              1: Curves.curve_null,#Curves.curve_d1r1p,
+                              2: Curves.curve_null,#Curves.curve_d1r2p,
                               3: Curves.curve_null,
                               4: Curves.curve_null,
                               5: Curves.curve_null,
@@ -66,18 +66,18 @@ class Filter(object):
                               7: Curves.curve_null,
                               }}
 
-        self.curve_idx_shape = {0: {0: Curves.curve_full,  # 0 for non-difference
-                                    1: Curves.curve_d0r1s,
-                                    2: Curves.curve_d0r2s,
+        self.curve_idx_shape = {0: {0: Curves.curve_null,#Curves.curve_full,  # 0 for non-difference
+                                    1: Curves.curve_null,#Curves.curve_d0r1s,
+                                    2: Curves.curve_null,#Curves.curve_d0r2s,
                                     3: Curves.curve_null,
                                     4: Curves.curve_null,
                                     5: Curves.curve_null,
                                     6: Curves.curve_null,
                                     7: Curves.curve_null,
                                     },
-                                1: {0: Curves.curve_d1r0s,#Curves.curve_null,  # 1 for difference y1 = (7.64960918 * x1 -7) / - 2.87156076
-                                    1: Curves.curve_d1r1s,##Curves.curve_null,   #y1 = (-6.55747136 * x1 +1) / - 0.34981225
-                                    2: Curves.curve_d1r2s,##Curves.curve_null,   #y1 = (-13.00472474 * x1 +1) / - 0.49462212
+                                1: {0: Curves.curve_null,#Curves.curve_d1r0s,  # 1 for difference y1 = (7.64960918 * x1 -7) / - 2.87156076
+                                    1: Curves.curve_null,#Curves.curve_d1r1s,
+                                    2: Curves.curve_null,#Curves.curve_d1r2s,
                                     3: Curves.curve_null,
                                     4: Curves.curve_null,
                                     5: Curves.curve_null,
@@ -616,11 +616,16 @@ def repeat_non_test(sentences, spell_checker, repeat_num):
     w = open(f'history.json', 'w', encoding='utf-8')
     w.write(json.dumps(correction_history, ensure_ascii=False, indent=4, sort_keys=False))
     w.close()
+
+    # 对于命令行执行模式 将结果反馈到屏幕
+    args = parse_args()
+    if args.mode == 's':
+        for i in range(len(correction_history)):
+            print('纠正前：', all_results[i]["original_sentence"])
+            print('纠正后：', all_results[i]["corrected_sentence"])
+
     #将每一个句子的纠错结果写入到result_{i}.josn中
     for i, res in enumerate(all_results):
-        #对于命令行执行模式 将结果反馈到屏幕
-        print('纠正前：', all_results[i]["original_sentence"])
-        print('纠正后：', all_results[i]["corrected_sentence"])
         w = open(f'results_{i}.json', 'w', encoding='utf-8')
         w.write(json.dumps(res, ensure_ascii=False, indent=4, sort_keys=False))
         w.close()

@@ -15,7 +15,7 @@
       "vocab": "model/pre-trained/vocab.txt",
       "bert_configs": "model/pre-trained/bert_config.json",
       "pre-trained": "model/pre-trained/bert_model.ckpt",
-      "fine-tuned": "model/fine-tune-15/model.ckpt-12000",
+      "fine-tuned": "model/fine-tune/model.ckpt-12000",
       "fine_tuning_is_on": true
     }
   },
