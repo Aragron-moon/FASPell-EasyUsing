@@ -226,8 +226,7 @@ eg:
 def parse_args():
     #使用命令介绍 该py文件是用来根据原始文件创建爱对应的与训练集合mask概率值
     usage = '\n1. create wrong.txt, correct.txt and mask_probability.sav by:\n' \
-            'python create_data.py -f /path/to/train.txt\n' \ 
-            '\n' \
+            'python create_data.py -f /path/to/train.txt\n' \
             '\n2. specify output dir by:\n' \
             'python create_data.py -f /path/to/train.txt -o /path/to/dir/\n' \
             '\n' 
