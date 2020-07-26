@@ -220,7 +220,7 @@ faspell_configs.json：
 
   fine_tuning_is_on为true；
 
-  union_of_sims为true；
+  union_of_sims为false；
 
   testing_set为./data/test_ofsighan15.txt；
 
